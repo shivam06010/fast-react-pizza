@@ -30,106 +30,150 @@ function CreateOrder() {
   const priorityPrice = withPriority ? totalCartPrice * 0.2 : 0;
 
   const totalPrice = totalCartPrice + priorityPrice;
+  console.log(cart);
 
   if (!cart.length) return <EmptyCart />;
   return (
     <div className="px-4 py-6">
-      <h2 className="mb-8 text-xl font-semibold">Ready to order? Let's go!</h2>
+      <h2 className="mb-8 text-center text-[28px] font-semibold text-stone-800">
+        Checkout
+      </h2>
 
-      <Form method="POST">
-        <div className="mb-5 flex flex-col sm:flex-row sm:items-center">
-          <label className="sm:basis-40">First Name</label>
-          <input
-            className="input grow"
-            type="text"
-            defaultValue={user.username}
-            name="customer"
-            required
-          />
-        </div>
+      <div className="mx-auto grid max-w-[900px] grid-cols-2 items-start gap-10">
+        <Form
+          method="POST"
+          className="rounded-[12px] border-1 border-stone-200 bg-white px-7 py-5"
+        >
+          <h2 className="mb-7 text-[22px] font-semibold text-stone-800">
+            Delivery Details
+          </h2>
+          <div className="space-y-3">
+            <div className="flex flex-col">
+              <label className="text-[14px] font-medium">Full Name</label>
+              <input
+                className="input grow"
+                type="text"
+                defaultValue={user.username}
+                name="customer"
+                required
+              />
+            </div>
 
-        <div className="mb-5 flex flex-col sm:flex-row sm:items-center">
-          <label
-            className={`${formErrors?.phone ? "sm:mb-10" : ""} sm:basis-40`}
-          >
-            Phone number
-          </label>
-          <div className="grow">
-            <input className="input w-full" type="tel" name="phone" required />
-            {formErrors?.phone && (
-              <p className="mt-2 rounded-md bg-red-100 p-2 text-xs text-red-700">
-                {formErrors.phone}
-              </p>
-            )}
+            <div className="flex flex-col">
+              <label className={`text-[14px] font-medium`}>Phone number</label>
+              <input className="input grow" type="tel" name="phone" required />
+              {formErrors?.phone && (
+                <p className="mt-2 rounded-md bg-red-100 p-2 text-xs text-red-700">
+                  {formErrors.phone}
+                </p>
+              )}
+            </div>
+
+            <div className="relative flex flex-col">
+              <label className="text-[14px] font-medium">Address</label>
+              <div className="grow">
+                <input
+                  className="input w-full"
+                  type="text"
+                  disabled={isLoadingAddress}
+                  defaultValue={address}
+                  name="address"
+                  required
+                />
+
+                {status === "error" && (
+                  <p className="mt-2 rounded-md bg-red-100 p-2 text-xs text-red-700">
+                    {errorAddress}
+                  </p>
+                )}
+              </div>
+              {!position.longitude && !position.latitude && (
+                <span className="absolute right-[3px] bottom-[3px] z-50 sm:top-[24px] sm:right-[3px]">
+                  <Button
+                    disabled={isLoadingAddress}
+                    type="small"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      dispatch(fetchAddress());
+                    }}
+                  >
+                    Get Position
+                  </Button>
+                </span>
+              )}
+            </div>
+
+            <div className="mt-5 mb-7 flex items-center gap-2">
+              <input
+                className="h-5 w-5 text-white accent-stone-900 focus:ring-offset-2 focus:outline-none"
+                type="checkbox"
+                name="priority"
+                id="priority"
+                value={withPriority}
+                onChange={(e) => setWithPriority(e.target.checked)}
+              />
+              <label htmlFor="priority " className="text-[14px] font-medium">
+                Want to give your order priority?
+              </label>
+            </div>
           </div>
-        </div>
 
-        <div className="relative mb-5 flex flex-col sm:flex-row sm:items-center">
-          <label className="sm:basis-40">Address</label>
-          <div className="grow">
+          <div>
+            <input type="hidden" name="cart" value={JSON.stringify(cart)} />
             <input
-              className="input w-full"
-              type="text"
-              disabled={isLoadingAddress}
-              defaultValue={address}
-              name="address"
-              required
+              type="hidden"
+              name="position"
+              value={
+                position.longitude && position.latitude
+                  ? `${position.latitude} , ${position.longitude}`
+                  : ""
+              }
             />
-
-            {status === "error" && (
-              <p className="mt-2 rounded-md bg-red-100 p-2 text-xs text-red-700">
-                {errorAddress}
-              </p>
-            )}
+            {/* <Button type="primary" disabled={isSubmitting || isLoadingAddress}>
+              {isSubmitting ? "Placing Order..." : `Place My Order`}
+            </Button> */}
+            <button
+              disabled={isSubmitting || isLoadingAddress}
+              className="w-full rounded-[12px] bg-[#d61313] py-2 text-[14px] font-medium text-white transition-all hover:scale-102"
+            >
+              {isSubmitting ? "Placing Order..." : `Place My Order`}
+            </button>
           </div>
-          {!position.longitude && !position.latitude && (
-            <span className="absolute right-[3px] bottom-[3px] z-50 sm:top-[5px] sm:right-[6px]">
-              <Button
-                disabled={isLoadingAddress}
-                type="small"
-                onClick={(e) => {
-                  e.preventDefault();
-                  dispatch(fetchAddress());
-                }}
-              >
-                Get Position
-              </Button>
+        </Form>
+        <section className="rounded-[12px] border-1 border-stone-200 bg-white px-7 py-5">
+          <h2 className="text-[22px] font-semibold text-stone-800">
+            Order Summary
+          </h2>
+
+          <ul>
+            {cart.map((item) => {
+              return (
+                <li
+                  key={item.name}
+                  className="mt-6 flex items-center justify-between border-b-1 border-stone-200 pb-3"
+                >
+                  <div>
+                    <h3 className="text-[16px] font-medium text-stone-800">
+                      {item.name}
+                    </h3>
+                    <span className="text-[14px] text-stone-600">
+                      Qty: {item.quantity}
+                    </span>
+                  </div>
+                  <span>{formatCurrency(item.totalPrice)}</span>
+                </li>
+              );
+            })}
+          </ul>
+
+          <div className="mt-6 flex justify-between">
+            <p className="text-[18px] font-semibold">Total:</p>
+            <span className="text-[18px] font-semibold">
+              {formatCurrency(totalPrice)}
             </span>
-          )}
-        </div>
-
-        <div className="mb-12 flex items-center gap-4">
-          <input
-            className="h-6 w-6 accent-yellow-400 focus:ring focus:ring-yellow-400 focus:ring-offset-2 focus:outline-none"
-            type="checkbox"
-            name="priority"
-            id="priority"
-            value={withPriority}
-            onChange={(e) => setWithPriority(e.target.checked)}
-          />
-          <label htmlFor="priority" className="font-medium">
-            Want to yo give your order priority?
-          </label>
-        </div>
-
-        <div>
-          <input type="hidden" name="cart" value={JSON.stringify(cart)} />
-          <input
-            type="hidden"
-            name="position"
-            value={
-              position.longitude && position.latitude
-                ? `${position.latitude} , ${position.longitude}`
-                : ""
-            }
-          />
-          <Button type="primary" disabled={isSubmitting || isLoadingAddress}>
-            {isSubmitting
-              ? "Placing Order..."
-              : `Order now from ${formatCurrency(totalPrice)}`}
-          </Button>
-        </div>
-      </Form>
+          </div>
+        </section>
+      </div>
     </div>
   );
 }

@@ -16,7 +16,7 @@ function SearchOrder() {
     <form onSubmit={handleSubmit}>
       <div className="relative">
         <input
-          className="w-28 rounded-full bg-lime-100 px-10 py-2 text-sm transition-all duration-500 placeholder:text-stone-400 focus:ring focus:ring-yellow-500 focus:ring-offset-2 focus:outline-none sm:w-64 sm:focus:w-100"
+          className="w-28 rounded-[12px] border-1 border-stone-200 bg-none px-10 py-2 text-sm transition-all duration-500 placeholder:text-stone-400 focus:ring focus:ring-yellow-500 focus:ring-offset-2 focus:outline-none sm:w-64 sm:focus:w-100"
           placeholder="Search order number"
           value={query}
           onChange={(e) => setQuery(e.target.value)}

@@ -9,12 +9,17 @@ function CartOverview() {
 
   if (!x) return;
   return (
-    <div className="flex items-center justify-between bg-stone-800 px-4 py-4 text-sm text-stone-200 uppercase sm:px-6 md:text-base">
-      <p className="space-x-4 font-semibold text-stone-300 sm:space-x-6">
+    <div className="flex items-center justify-between border-1 border-t-stone-200 bg-white px-4 py-4 text-sm text-stone-800 uppercase sm:px-6 md:text-base">
+      <p className="space-x-4 font-semibold text-stone-800 sm:space-x-6">
         <span> {x} pizzas</span>
         <span>{formatCurrency(price)}</span>
       </p>
-      <Link to="/cart">Open cart &rarr;</Link>
+      <Link
+        to="/cart"
+        className="rounded-[8px] bg-[#d61313] px-2 py-2 text-[12px] font-semibold text-white"
+      >
+        Go to cart &rarr;
+      </Link>
     </div>
   );
 }
